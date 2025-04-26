@@ -45,7 +45,7 @@
   <div class="container">
     <h1>Bank Management System</h1>
 
-    <!-- Branch Selector -->
+   
     <form>
       <label for="branchSelect">Select Branch:</label>
       <select id="branchSelect" name="branchSelect">
@@ -55,7 +55,7 @@
       </select>
     </form>
 
-    <!-- Branch Contact Info -->
+   
     <div class="contact-box">
       <h3>Branch Contact Info</h3>
       <ul>
@@ -65,7 +65,6 @@
       </ul>
     </div>
 
-    <!-- Service Selector -->
     <label for="serviceSelect">Choose Service:</label>
     <select id="serviceSelect" onchange="toggleForms()">
       <option value="">-- Select --</option>
@@ -73,11 +72,11 @@
       <option value="transaction">Make Transaction</option>
     </select>
 
-    <!-- Account Creation Form -->
+   
     <form id="accountForm" class="form-section" action="process.php" method="post">
       <h3>Create Account</h3>
 
-      <!-- branchSelect is outside this form; include hidden copy -->
+
       <input type="hidden" name="branchSelect" id="branchSelectHidden">
 
       <label for="accountType">Account Type:</label>
@@ -119,7 +118,7 @@
       <button type="submit">Submit</button>
     </form>
 
-    <!-- Transaction Form -->
+   
     <form id="transactionForm" class="form-section" action="process.php" method="post">
       <h3>Make a Transaction</h3>
 
@@ -158,7 +157,7 @@
   </div>
 
   <script>
-    // copy branchSelect into hidden inputs so PHP sees it in both forms
+   
     const branchSelect = document.getElementById('branchSelect');
     const hidden1 = document.getElementById('branchSelectHidden');
     const hidden2 = document.getElementById('branchSelectHidden2');
@@ -166,7 +165,7 @@
       hidden1.value = branchSelect.value;
       hidden2.value = branchSelect.value;
     });
-    // initialize hidden values
+    
     hidden1.value = branchSelect.value;
     hidden2.value = branchSelect.value;
 
