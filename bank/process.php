@@ -1,17 +1,15 @@
 <?php
-// process.php
 require 'db_connect.php';
 
 $branchID = intval($_POST['branchSelect']);
 
-// 1) CREATE ACCOUNT
+
 if (isset($_POST['openDate'])) {
-    // common account fields
+   
     $openDate = $_POST['openDate'];
     $balance  = floatval($_POST['balance']);
     $status   = $_POST['status'];
 
-    // insert into account
     $stmt = $mysqli->prepare(
       "INSERT INTO account (Balance, OpenDate, BranchID, Status) 
        VALUES (?, ?, ?, ?)"
@@ -21,7 +19,7 @@ if (isset($_POST['openDate'])) {
     $accountID = $stmt->insert_id;
     $stmt->close();
 
-    // now insert into subtype
+   
     $type = $_POST['accountType'];
     if ($type === 'savings') {
         $ir = floatval($_POST['interestRate']);
@@ -42,7 +40,7 @@ if (isset($_POST['openDate'])) {
         );
         $stmt->bind_param("iiddi", $branchID, $accountID, $loanAmt, $loanIr, $loanTerm);
     }
-    else { // checking/current
+    else { 
         $stmt = $mysqli->prepare(
           "INSERT INTO checkingaccount (AccountID, BranchID) VALUES (?, ?)"
         );
@@ -54,13 +52,13 @@ if (isset($_POST['openDate'])) {
     echo "Account #{$accountID} created successfully.";
 
 }
-// 2) TRANSACTION
+
 elseif (isset($_POST['amount'])) {
     $accountID = intval($_POST['accountId']);
     $amount    = floatval($_POST['amount']);
     $type      = $_POST['transactionType'];
 
-    // insert into transaction
+   
     $stmt = $mysqli->prepare(
       "INSERT INTO transaction (AccountID, Amount, Type) VALUES (?, ?, ?)"
     );
@@ -69,7 +67,7 @@ elseif (isset($_POST['amount'])) {
     $transID = $stmt->insert_id;
     $stmt->close();
 
-    // subtype
+  
     if ($type === 'Deposit') {
         $method = $_POST['depositMethod'];
         $stmt = $mysqli->prepare(
@@ -86,7 +84,7 @@ elseif (isset($_POST['amount'])) {
         );
         $stmt->bind_param("iis", $branchID, $transID, $method);
     }
-    else { // Transfer
+    else { 
         $receiver = intval($_POST['receiverId']);
         $stmt = $mysqli->prepare(
           "INSERT INTO transfer (TransactionID, ReceiverAccountID, SenderbranchID, ReceiverbranchID)
