@@ -1,191 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bank Management Frontend</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: blue;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px blue;
-    }
-    h1, h3 { color: black; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    input, select {
-      width: 100%; padding: 8px; margin-top: 5px;
-      border-radius: 4px; border: 1px solid #ccc;
-    }
-    button {
-      margin-top: 20px; padding: 10px 20px;
-      background-color: #0078d7; color: white;
-      border: none; border-radius: 5px; cursor: pointer;
-    }
-    button:hover { background-color: #005fa3; }
-    .contact-box {
-      background-color: #eef; padding: 15px;
-      border-radius: 8px; margin: 15px 0;
-    }
-    .form-section { display: none; }
-    #savingsDetails, #loanDetails, #depositDetails, #withdrawalDetails, #transferDetails {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RV Bank - Banking Solutions</title>
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --light-blue: #e8f0fe;
+            --dark-blue: #0d47a1;
+            --white: #ffffff;
+            --gray: #f5f5f5;
+            --dark-gray: #757575;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--white);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 50px;
+            margin-right: 15px;
+        }
+        
+        .bank-name {
+            color: var(--primary-blue);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .option-card {
+            background-color: var(--white);
+            border: 2px solid var(--light-blue);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+        }
+        
+        .option-card h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .option-card i {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .form-container {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 3rem;
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-title {
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-blue);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .branches {
+            background-color: var(--light-blue);
+            padding: 2rem;
+            border-radius: 10px;
+        }
+        
+        .branches h2 {
+            color: var(--primary-blue);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .branch-list {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .branch {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .branch h3 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 0.5rem;
+        }
+        
+        .branch p {
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            background-color: var(--light-blue);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 768px) {
+            .options-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-card {
+                width: 100%;
+            }
+            
+            .branch-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Bank Management System</h1>
-
-   
-    <form>
-      <label for="branchSelect">Select Branch:</label>
-      <select id="branchSelect" name="branchSelect">
-        <option value="1">WHITEFIELD</option>
-        <option value="2">JP NAGAR</option>
-        <option value="3">YESWANTPUR</option>
-      </select>
-    </form>
-
-   
-    <div class="contact-box">
-      <h3>Branch Contact Info</h3>
-      <ul>
-        <li><strong>WHITEFIELD:</strong> 999-888-7777 | whitefield@bank.com</li>
-        <li><strong>JP NAGAR:</strong> 888-777-6666 | jpnagar@bank.com</li>
-        <li><strong>YESWANTPUR:</strong> 777-666-5555 | yeswantpur@bank.com</li>
-      </ul>
-    </div>
-
-    <label for="serviceSelect">Choose Service:</label>
-    <select id="serviceSelect" onchange="toggleForms()">
-      <option value="">-- Select --</option>
-      <option value="createAccount">Create Account</option>
-      <option value="transaction">Make Transaction</option>
-    </select>
-
-   
-    <form id="accountForm" class="form-section" action="process.php" method="post">
-      <h3>Create Account</h3>
-
-
-      <input type="hidden" name="branchSelect" id="branchSelectHidden">
-
-      <label for="accountType">Account Type:</label>
-      <select id="accountType" name="accountType">
-        <option value="savings">Savings Account</option>
-        <option value="loan">Loan Account</option>
-        <option value="checking">Current Account</option>
-      </select>
-
-      <label for="openDate">Open Date:</label>
-      <input type="date" id="openDate" name="openDate" required>
-
-      <label for="balance">Initial Balance:</label>
-      <input type="number" id="balance" name="balance" required>
-
-      <label for="status">Status:</label>
-      <select id="status" name="status">
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-        <option value="Closed">Closed</option>
-      </select>
-
-      <div id="savingsDetails">
-        <label for="interestRate">Interest Rate (%):</label>
-        <input type="number" step="0.01" id="interestRate" name="interestRate">
-        <label for="minBalance">Minimum Balance:</label>
-        <input type="number" id="minBalance" name="minBalance">
-      </div>
-
-      <div id="loanDetails">
-        <label for="loanAmount">Loan Amount:</label>
-        <input type="number" id="loanAmount" name="loanAmount">
-        <label for="loanInterestRate">Interest Rate (%):</label>
-        <input type="number" step="0.01" id="loanInterestRate" name="loanInterestRate">
-        <label for="loanTerm">Loan Term (Months):</label>
-        <input type="number" id="loanTerm" name="loanTerm">
-      </div>
-
-      <button type="submit">Submit</button>
-    </form>
-
-   
-    <form id="transactionForm" class="form-section" action="process.php" method="post">
-      <h3>Make a Transaction</h3>
-
-      <input type="hidden" name="branchSelect" id="branchSelectHidden2">
-
-      <label for="accountId">Account ID:</label>
-      <input type="number" id="accountId" name="accountId" required>
-
-      <label for="transactionType">Transaction Type:</label>
-      <select id="transactionType" name="transactionType" onchange="toggleTransactionDetails()">
-        <option value="Deposit">Deposit</option>
-        <option value="Withdrawal">Withdrawal</option>
-        <option value="Transfer">Transfer</option>
-      </select>
-
-      <label for="amount">Amount:</label>
-      <input type="number" id="amount" name="amount" required>
-
-      <div id="depositDetails">
-        <label for="depositMethod">Deposit Method:</label>
-        <input type="text" id="depositMethod" name="depositMethod">
-      </div>
-
-      <div id="withdrawalDetails">
-        <label for="withdrawalMethod">Withdrawal Method:</label>
-        <input type="text" id="withdrawalMethod" name="withdrawalMethod">
-      </div>
-
-      <div id="transferDetails">
-        <label for="receiverId">Receiver Account ID:</label>
-        <input type="number" id="receiverId" name="receiverId">
-      </div>
-
-      <button type="submit">Submit</button>
-    </form>
-  </div>
-
-  <script>
-   
-    const branchSelect = document.getElementById('branchSelect');
-    const hidden1 = document.getElementById('branchSelectHidden');
-    const hidden2 = document.getElementById('branchSelectHidden2');
-    branchSelect.addEventListener('change', () => {
-      hidden1.value = branchSelect.value;
-      hidden2.value = branchSelect.value;
-    });
+    <header>
+        <div class="logo-container">
+            <img src="C:\xampp\htdocs\rvbank\images\simple-clean-crisp-creative-rv-logo-icon-design-vector-format-170826578.webp" alt="RV Bank Logo" class="logo" id="bankLogo">
+            <h1 class="bank-name">RV BANK</h1>
+        </div>
+    </header>
     
-    hidden1.value = branchSelect.value;
-    hidden2.value = branchSelect.value;
-
-    function toggleForms() {
-      const s = document.getElementById('serviceSelect').value;
-      document.getElementById('accountForm').style.display = s==='createAccount'?'block':'none';
-      document.getElementById('transactionForm').style.display = s==='transaction'?'block':'none';
-    }
-
-    document.getElementById('accountType').addEventListener('change', function(){
-      document.getElementById('savingsDetails').style.display = this.value==='savings'?'block':'none';
-      document.getElementById('loanDetails').style.display    = this.value==='loan'   ?'block':'none';
-    });
-
-    function toggleTransactionDetails(){
-      const t = document.getElementById('transactionType').value;
-      document.getElementById('depositDetails').style.display    = t==='Deposit'   ?'block':'none';
-      document.getElementById('withdrawalDetails').style.display = t==='Withdrawal'?'block':'none';
-      document.getElementById('transferDetails').style.display   = t==='Transfer'  ?'block':'none';
-    }
-  </script>
+    <div class="container">
+        <h2 style="text-align: center; color: var(--primary-blue); margin-bottom: 2rem;">Welcome to RV Bank - Your Trusted Banking Partner</h2>
+        
+        <div class="options-container">
+            <div class="option-card" onclick="showForm('createAccount')">
+                <i class="fas fa-user-plus"></i>
+                <h3>Create Account</h3>
+                <p>Open a new savings, current or loan account with us</p>
+            </div>
+            
+            <div class="option-card" onclick="showForm('makeTransaction')">
+                <i class="fas fa-exchange-alt"></i>
+                <h3>Make Transaction</h3>
+                <p>Transfer funds, deposit or withdraw money from your account</p>
+            </div>
+            
+            <div class="option-card" onclick="showForm('viewAccount')">
+                <i class="fas fa-search"></i>
+                <h3>View Account</h3>
+                <p>Check your account details and transaction history</p>
+            </div>
+        </div>
+        
+        <!-- Create Account Form -->
+        <div id="createAccountForm" class="form-container">
+            <h2 class="form-title">Create New Account</h2>
+            <form id="accountForm" action="process.php" method="post">
+                <div class="form-group">
+                    <label for="branch">Select Branch:</label>
+                    <select id="branch" name="branch" required>
+                        <option value="">-- Select Branch --</option>
+                        <option value="Whitefield">Whitefield</option>
+                        <option value="JP Nagar">JP Nagar</option>
+                        <option value="Yeswantpur">Yeswantpur</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountType">Account Type:</label>
+                    <select id="accountType" name="accountType" required onchange="showAccountFields()">
+                        <option value="">-- Select Account Type --</option>
+                        <option value="savings">Savings Account</option>
+                        <option value="current">Current Account</option>
+                        <option value="loan">Loan Account</option>
+                    </select>
+                </div>
+                
+                <div id="accountFields"></div>
+                
+                <button type="submit" class="btn btn-submit">Create Account</button>
+            </form>
+        </div>
+        
+        <!-- Make Transaction Form -->
+        <div id="makeTransactionForm" class="form-container">
+            <h2 class="form-title">Make Transaction</h2>
+            <form id="transactionForm" action="process.php" method="post">
+                <div class="form-group">
+                    <label for="transactionType">Transaction Type:</label>
+                    <select id="transactionType" name="transactionType" required onchange="showTransactionFields()">
+                        <option value="">-- Select Transaction Type --</option>
+                        <option value="transfer">Transfer</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="withdraw">Withdraw</option>
+                    </select>
+                </div>
+                
+                <div id="transactionFields"></div>
+                
+                <button type="submit" class="btn btn-submit">Process Transaction</button>
+            </form>
+        </div>
+        
+        <!-- View Account Form -->
+        <div id="viewAccountForm" class="form-container">
+            <h2 class="form-title">View Account Details</h2>
+            <form id="viewAccountForm" action="process.php" method="post">
+                <div class="form-group">
+                    <label for="accountId">Account ID:</label>
+                    <input type="text" id="accountId" name="accountId" required placeholder="Enter your account ID">
+                </div>
+                
+                <button type="submit" class="btn btn-submit">View Account</button>
+            </form>
+        </div>
+        
+        <div class="branches">
+            <h2>Our Branches</h2>
+            <div class="branch-list">
+                <div class="branch">
+                    <h3>Whitefield Branch</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Tech Park, Whitefield</p>
+                    <p><i class="fas fa-phone"></i> +91 80 1234 5678</p>
+                    <p><i class="fas fa-envelope"></i> whitefield@rvbank.com</p>
+                </div>
+                
+                <div class="branch">
+                    <h3>JP Nagar Branch</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 456 Finance Street, JP Nagar</p>
+                    <p><i class="fas fa-phone"></i> +91 80 2345 6789</p>
+                    <p><i class="fas fa-envelope"></i> jpnagar@rvbank.com</p>
+                </div>
+                
+                <div class="branch">
+                    <h3>Yeswantpur Branch</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 789 Business Avenue, Yeswantpur</p>
+                    <p><i class="fas fa-phone"></i> +91 80 3456 7890</p>
+                    <p><i class="fas fa-envelope"></i> yeswantpur@rvbank.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 RV Bank. All Rights Reserved.</p>
+        <p>Banking solutions for a better tomorrow</p>
+    </footer>
+    
+    <script>
+        // Show the selected form and hide others
+        function showForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Show the selected form
+            document.getElementById(formId + 'Form').classList.add('active');
+            
+            // Scroll to the form
+            document.getElementById(formId + 'Form').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Show appropriate fields based on account type selection
+        function showAccountFields() {
+            const accountType = document.getElementById('accountType').value;
+            const accountFields = document.getElementById('accountFields');
+            
+            let fieldsHTML = '';
+            
+            if (accountType === 'savings') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="name">Full Name:</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="openDate">Open Date:</label>
+                        <input type="date" id="openDate" name="openDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initialDeposit">Initial Deposit (₹):</label>
+                        <input type="number" id="initialDeposit" name="initialDeposit" required placeholder="Enter amount">
+                    </div>
+                `;
+            } else if (accountType === 'current') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="name">Full Name:</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                `;
+            } else if (accountType === 'loan') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="name">Full Name:</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanAmount">Loan Amount (₹):</label>
+                        <input type="number" id="loanAmount" name="loanAmount" required placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label for="term">Term (months):</label>
+                        <input type="number" id="term" name="term" required placeholder="Enter loan term">
+                    </div>
+                    <div class="form-group">
+                        <label for="interestRate">Interest Rate (%):</label>
+                        <input type="number" step="0.01" id="interestRate" name="interestRate" required placeholder="Enter interest rate">
+                    </div>
+                `;
+            }
+            
+            accountFields.innerHTML = fieldsHTML;
+        }
+        
+        // Show appropriate fields based on transaction type selection
+        function showTransactionFields() {
+            const transactionType = document.getElementById('transactionType').value;
+            const transactionFields = document.getElementById('transactionFields');
+            
+            let fieldsHTML = '';
+            
+            if (transactionType === 'transfer') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="senderAccount">Sender's Account ID:</label>
+                        <input type="text" id="senderAccount" name="senderAccount" required placeholder="Enter sender account ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (₹):</label>
+                        <input type="number" id="amount" name="amount" required placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label for="receiverAccount">Receiver's Account ID:</label>
+                        <input type="text" id="receiverAccount" name="receiverAccount" required placeholder="Enter receiver account ID">
+                    </div>
+                `;
+            } else if (transactionType === 'deposit') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="accountId">Account ID:</label>
+                        <input type="text" id="accountId" name="accountId" required placeholder="Enter your account ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (₹):</label>
+                        <input type="number" id="amount" name="amount" required placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label for="mode">Mode of Deposit:</label>
+                        <select id="mode" name="mode" required>
+                            <option value="">-- Select Mode --</option>
+                            <option value="cash">Cash</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="online">Online Transfer</option>
+                        </select>
+                    </div>
+                `;
+            } else if (transactionType === 'withdraw') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label for="accountId">Account ID:</label>
+                        <input type="text" id="accountId" name="accountId" required placeholder="Enter your account ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (₹):</label>
+                        <input type="number" id="amount" name="amount" required placeholder="Enter amount">
+                    </div>
+                `;
+            }
+            
+            transactionFields.innerHTML = fieldsHTML;
+        }
+        
+        // Set the logo (you would replace this with your actual logo path)
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real implementation, you would set the actual logo path here
+            // document.getElementById('bankLogo').src = "C:/Users/user/OneDrive/Desktop/photos/simple-clean-crisp-creative-rv-logo-icon-design-vector-format-170826578.webp";
+        });
+    </script>
 </body>
 </html>
