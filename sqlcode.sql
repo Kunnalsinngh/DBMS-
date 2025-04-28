@@ -1,104 +1,132 @@
-USE bankdb;
-CREATE TABLE IF NOT EXISTS branch (
-    BranchID INT AUTO_INCREMENT PRIMARY KEY,
-    Location VARCHAR(255)
+-- Create the database
+CREATE DATABASE IF NOT EXISTS rv_bank;
+USE rv_bank;
+
+-- Create branches table
+CREATE TABLE branches (
+    branch_id INT PRIMARY KEY AUTO_INCREMENT,
+    branch_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS branch_contact (
-    BranchID INT,
-    ContactNumber VARCHAR(20),
-    PRIMARY KEY (BranchID),
-    FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE CASCADE
+-- Insert branch data
+INSERT INTO branches (branch_id, branch_name, email, phone, address) VALUES
+(1, 'Whitefield', 'whitefield@rvbank.com', '+91 80 1234 5678', '123 Tech Park, Whitefield'),
+(2, 'JP Nagar', 'jpnagar@rvbank.com', '+91 80 2345 6789', '456 Finance Street, JP Nagar'),
+(3, 'Yeswantpur', 'yeswantpur@rvbank.com', '+91 80 3456 7890', '789 Business Avenue, Yeswantpur');
+
+-- Create customers table (common customer information)
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    branch_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
 
-CREATE TABLE IF NOT EXISTS bankemployee (
-    EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    Position VARCHAR(50),
-    Contact VARCHAR(50),
-    BranchID INT,
-    EmployeeImage BLOB,  
-    FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL
+-- Create savings_accounts table
+CREATE TABLE savings_accounts (
+    account_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    account_number VARCHAR(20) UNIQUE NOT NULL,
+    open_date DATE NOT NULL,
+    initial_deposit DECIMAL(12, 2) NOT NULL,
+    current_balance DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
 
--- Manager Table
-CREATE TABLE IF NOT EXISTS branchmanager (
-    EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
-	BranchID INT,
-	FOREIGN KEY (EmployeeID) REFERENCES bankemployee(EmployeeID) ON DELETE CASCADE,
-	FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL
+-- Create current_accounts table
+CREATE TABLE current_accounts (
+    account_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    account_number VARCHAR(20) UNIQUE NOT NULL,
+    current_balance DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
 
-CREATE TABLE IF NOT EXISTS account (
-    AccountID INT AUTO_INCREMENT PRIMARY KEY,
-    Balance DECIMAL(15,2) DEFAULT 0.00,
-    OpenDate DATE NOT NULL,
-    BranchID INT,
-    Status ENUM('Active', 'Inactive', 'Closed') DEFAULT 'Active',
-    FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL
+-- Create loan_accounts table
+CREATE TABLE loan_accounts (
+    loan_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    loan_number VARCHAR(20) UNIQUE NOT NULL,
+    loan_amount DECIMAL(12, 2) NOT NULL,
+    term_months INT NOT NULL,
+    interest_rate DECIMAL(5, 2) NOT NULL,
+    remaining_balance DECIMAL(12, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
 
-CREATE TABLE IF NOT EXISTS checkingaccount (
-    AccountID INT PRIMARY KEY,
-     BranchID INT,
-     FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    FOREIGN KEY (AccountID) REFERENCES account(AccountID) ON DELETE CASCADE
+-- Create transactions table (parent table for all transaction types)
+CREATE TABLE transactions (
+    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+    branch_id INT NOT NULL,
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    amount DECIMAL(12, 2) NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
 
-CREATE TABLE IF NOT EXISTS savingsaccount (
-BranchID INT,
-FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    AccountID INT PRIMARY KEY,
-    InterestRate DECIMAL(5,2),
-    MinBalance DECIMAL(15,2),
-    FOREIGN KEY (AccountID) REFERENCES account(AccountID) ON DELETE CASCADE
+-- Create transfer_transactions table
+CREATE TABLE transfer_transactions (
+    transfer_id INT PRIMARY KEY,
+    sender_account VARCHAR(20) NOT NULL,
+    receiver_account VARCHAR(20) NOT NULL,
+    FOREIGN KEY (transfer_id) REFERENCES transactions(transaction_id)
 );
 
-CREATE TABLE IF NOT EXISTS loanaccount (
-	BranchID INT,
-FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    AccountID INT PRIMARY KEY,
-    LoanAmount DECIMAL(15,2),
-    InterestRate DECIMAL(5,2),
-    LoanTerm INT,
-    FOREIGN KEY (AccountID) REFERENCES account(AccountID) ON DELETE CASCADE
+-- Create deposit_transactions table
+CREATE TABLE deposit_transactions (
+    deposit_id INT PRIMARY KEY,
+    account_number VARCHAR(20) NOT NULL,
+    mode ENUM('cash', 'cheque', 'online') NOT NULL,
+    FOREIGN KEY (deposit_id) REFERENCES transactions(transaction_id)
 );
 
-CREATE TABLE IF NOT EXISTS transaction (
-    TransactionID INT AUTO_INCREMENT PRIMARY KEY,
-    AccountID INT,
-    Amount DECIMAL(15,2) NOT NULL,
-    Type ENUM('Deposit', 'Withdrawal', 'Transfer'),
-    Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Status ENUM('Success', 'Pending', 'Failed') DEFAULT 'Success',
-    Receipt BLOB,  
-    FOREIGN KEY (AccountID) REFERENCES account(AccountID) ON DELETE CASCADE
+-- Create withdraw_transactions table
+CREATE TABLE withdraw_transactions (
+    withdraw_id INT PRIMARY KEY,
+    account_number VARCHAR(20) NOT NULL,
+    FOREIGN KEY (withdraw_id) REFERENCES transactions(transaction_id)
 );
 
-CREATE TABLE IF NOT EXISTS deposit (
-BranchID INT,
-FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    TransactionID INT PRIMARY KEY,
-    DepositMethod VARCHAR(50),
-    FOREIGN KEY (TransactionID) REFERENCES transaction(TransactionID) ON DELETE CASCADE
+-- Create account_view_log table (for tracking view account requests)
+CREATE TABLE account_view_log (
+    log_id INT PRIMARY KEY AUTO_INCREMENT,
+    account_number VARCHAR(20) NOT NULL,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45)
 );
 
-CREATE TABLE IF NOT EXISTS withdrawal (
-BranchID INT,
-FOREIGN KEY (BranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    TransactionID INT PRIMARY KEY,
-    WithdrawalMethod VARCHAR(50),
-    FOREIGN KEY (TransactionID) REFERENCES transaction(TransactionID) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS transfer (
-    TransactionID INT PRIMARY KEY,
-    ReceiverAccountID INT,
-    SenderbranchID INT,
-    ReceiverbranchID INT,
-FOREIGN KEY (SenderbranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-FOREIGN KEY (ReceiverbranchID) REFERENCES branch(BranchID) ON DELETE SET NULL,
-    FOREIGN KEY (TransactionID) REFERENCES transaction(TransactionID) ON DELETE CASCADE,
-    FOREIGN KEY (ReceiverAccountID) REFERENCES account(AccountID) ON DELETE CASCADE
-);
-
+-- Function to generate account numbers
+DELIMITER //
+CREATE FUNCTION generate_account_number(branch_id INT, account_type CHAR(1)) RETURNS VARCHAR(20)
+DETERMINISTIC
+BEGIN
+    DECLARE next_id INT;
+    DECLARE account_num VARCHAR(20);
+    
+    -- Get the next available ID for the account type
+    IF account_type = 'S' THEN
+        SELECT COALESCE(MAX(account_id), 0) + 1 INTO next_id FROM savings_accounts;
+    ELSEIF account_type = 'C' THEN
+        SELECT COALESCE(MAX(account_id), 0) + 1 INTO next_id FROM current_accounts;
+    ELSEIF account_type = 'L' THEN
+        SELECT COALESCE(MAX(loan_id), 0) + 1 INTO next_id FROM loan_accounts;
+    END IF;
+    
+    -- Format the account number: BRANCHID-ACCOUNTTYPE-00000ID
+    SET account_num = CONCAT(LPAD(branch_id, 2, '0'), '-', account_type, '-', LPAD(next_id, 5, '0'));
+    
+    RETURN account_num;
+END //
+DELIMITER ;
