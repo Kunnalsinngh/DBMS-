@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RV Bank - Banking Solutions</title>
     <style>
-        :root {
+         :root {
             --primary-blue: #1a73e8;
             --light-blue: #e8f0fe;
             --dark-blue: #0d47a1;
@@ -222,7 +222,104 @@
             background-color: var(--light-blue);
             color: var(--dark-gray);
         }
-        
+        .account-details-container {
+    background-color: var(--white);
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    max-width: 800px;
+}
+
+.account-details-container h3 {
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.8rem;
+    border-bottom: 2px solid var(--light-blue);
+    padding-bottom: 1rem;
+}
+
+.account-details-container p {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.account-details-container p strong {
+    color: var(--dark-blue);
+    display: inline-block;
+    width: 180px;
+}
+
+.balance-highlight {
+    background-color: var(--light-blue);
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.transaction-history {
+    margin-top: 2rem;
+}
+
+.transaction-history h4 {
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.transaction-table th {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.transaction-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.transaction-table tr:nth-child(even) {
+    background-color: var(--light-blue);
+}
+
+.deposit-amount {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.withdraw-amount {
+    color: #c62828;
+    font-weight: bold;
+}
+.error-message {
+    color: #c62828;
+    background-color: #ffebee;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    border-left: 4px solid #c62828;
+}
+
+.success-message {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    border-left: 4px solid #2e7d32;
+}
         @media (max-width: 768px) {
             .options-container {
                 flex-direction: column;
@@ -237,7 +334,7 @@
                 flex-direction: column;
             }
         }
-    </style>
+    </style> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -275,6 +372,7 @@
         <div id="createAccountForm" class="form-container">
             <h2 class="form-title">Create New Account</h2>
             <form id="accountForm" action="process.php" method="post">
+                <input type="hidden" name="form_type" value="create_account">
                 <div class="form-group">
                     <label for="branch">Select Branch:</label>
                     <select id="branch" name="branch" required>
@@ -305,6 +403,7 @@
         <div id="makeTransactionForm" class="form-container">
             <h2 class="form-title">Make Transaction</h2>
             <form id="transactionForm" action="process.php" method="post">
+                <input type="hidden" name="form_type" value="make_transaction">
                 <div class="form-group">
                     <label for="transactionType">Transaction Type:</label>
                     <select id="transactionType" name="transactionType" required onchange="showTransactionFields()">
@@ -321,18 +420,20 @@
             </form>
         </div>
         
+   
         <!-- View Account Form -->
-        <div id="viewAccountForm" class="form-container">
-            <h2 class="form-title">View Account Details</h2>
-            <form id="viewAccountForm" action="process.php" method="post">
-                <div class="form-group">
-                    <label for="accountId">Account ID:</label>
-                    <input type="text" id="accountId" name="accountId" required placeholder="Enter your account ID">
-                </div>
-                
-                <button type="submit" class="btn btn-submit">View Account</button>
-            </form>
+<div id="viewAccountForm" class="form-container">
+    <h2 class="form-title">View Account Details</h2>
+    <form id="viewAccountForm" action="process.php" method="post">
+        <input type="hidden" name="form_type" value="view_account">  <!-- Add this line -->
+        <div class="form-group">
+            <label for="accountId">Account ID:</label>
+            <input type="text" id="accountId" name="accountId" required placeholder="Enter your account ID">
         </div>
+        
+        <button type="submit" class="btn btn-submit">View Account</button>
+    </form>
+</div>
         
         <div class="branches">
             <h2>Our Branches</h2>
