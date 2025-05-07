@@ -2,7 +2,7 @@
 $host     = "localhost";
 $username = "root";
 $password = "";        
-$dbname   = "bankdb";
+$dbname = "rv_bank";
 $port     = 3306;     
 
 
