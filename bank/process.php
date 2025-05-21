@@ -124,37 +124,120 @@ function generate_account_number($conn, $branch_id, $account_type) {
 
 // Helper function to display account details
 function display_account_details($account, $account_type) {
-    echo '<div class="account-details-container">';
-    echo '<h3>' . $account_type . ' Details</h3>';
-    echo '<p><strong>Account Number:</strong> ' . $account['account_number'] . '</p>';
-    echo '<p><strong>Customer Name:</strong> ' . $account['name'] . '</p>';
-    echo '<p><strong>Branch:</strong> ' . $account['branch_name'] . '</p>';
-    echo '<div class="balance-highlight">';
-    echo '<strong>Current Balance:</strong> ₹' . number_format($account['current_balance'], 2);
-    echo '</div>';
-    
+    echo '<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Details</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --light-blue: #e8f0fe;
+            --dark-blue: #0d47a1;
+            --white: #ffffff;
+            --gray: #f5f5f5;
+            --dark-gray: #757575;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--white);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .account-details-container {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .account-details-container h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 1rem;
+        }
+        
+        .account-details-container p {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .account-details-container p strong {
+            color: var(--dark-blue);
+            display: inline-block;
+            width: 180px;
+        }
+        
+        .balance-highlight {
+            background-color: var(--light-blue);
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            border-left: 4px solid var(--primary-blue);
+        }
+        </style>
+    </head>
+    <body>
+        <div class="account-details-container">
+            <h3>'.$account_type.' Details</h3>
+            <div class="account-details-content">
+                <p><strong>Account Number:</strong> '.htmlspecialchars($account['account_number']).'</p>
+                <p><strong>Customer Name:</strong> '.htmlspecialchars($account['name']).'</p>
+                <p><strong>Branch:</strong> '.htmlspecialchars($account['branch_name']).'</p>
+                <div class="balance-highlight">
+                    <strong>Current Balance:</strong> ₹'.number_format($account['current_balance'], 2).'
+                </div>';
+
     if ($account_type == 'Savings Account') {
-        echo '<p><strong>Open Date:</strong> ' . $account['open_date'] . '</p>';
-        echo '<p><strong>Initial Deposit:</strong> ₹' . number_format($account['initial_deposit'], 2) . '</p>';
+        echo '<p><strong>Open Date:</strong> '.htmlspecialchars($account['open_date']).'</p>
+              <p><strong>Initial Deposit:</strong> ₹'.number_format($account['initial_deposit'], 2).'</p>';
     }
     
-    echo '</div>';
+    echo '    </div>
+        </div>
+    </body>
+    </html>';
 }
-
 // Helper function to display loan details
 function display_loan_details($loan) {
     echo '<div class="account-details-container">';
     echo '<h3>Loan Account Details</h3>';
-    echo '<p><strong>Loan Number:</strong> ' . $loan['loan_number'] . '</p>';
-    echo '<p><strong>Customer Name:</strong> ' . $loan['name'] . '</p>';
-    echo '<p><strong>Branch:</strong> ' . $loan['branch_name'] . '</p>';
+    
+    echo '<div class="account-details-content">';
+    echo '<p><strong>Loan Number:</strong> ' . htmlspecialchars($loan['loan_number']) . '</p>';
+    echo '<p><strong>Customer Name:</strong> ' . htmlspecialchars($loan['name']) . '</p>';
+    echo '<p><strong>Branch:</strong> ' . htmlspecialchars($loan['branch_name']) . '</p>';
     echo '<p><strong>Loan Amount:</strong> ₹' . number_format($loan['loan_amount'], 2) . '</p>';
+    
     echo '<div class="balance-highlight">';
     echo '<strong>Remaining Balance:</strong> ₹' . number_format($loan['remaining_balance'], 2);
     echo '</div>';
-    echo '<p><strong>Term:</strong> ' . $loan['term_months'] . ' months</p>';
-    echo '<p><strong>Interest Rate:</strong> ' . $loan['interest_rate'] . '%</p>';
-    echo '</div>';
+    
+    echo '<p><strong>Term:</strong> ' . htmlspecialchars($loan['term_months']) . ' months</p>';
+    echo '<p><strong>Interest Rate:</strong> ' . htmlspecialchars($loan['interest_rate']) . '%</p>';
+    
+    echo '</div>'; // Close account-details-content
+    echo '</div>'; // Close account-details-container
 }
 
 // Handle form type
