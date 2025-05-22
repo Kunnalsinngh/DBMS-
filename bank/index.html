@@ -1,4 +1,3 @@
-index.html:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -372,7 +371,7 @@ index.html:
         <!-- Create Account Form -->
         <div id="createAccountForm" class="form-container">
             <h2 class="form-title">Create New Account</h2>
-            <form id="accountForm" action="process.php" method="post">
+           <form id="accountForm" action="process.php" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="form_type" value="create_account">
                 <div class="form-group">
                     <label for="branch">Select Branch:</label>
@@ -486,57 +485,57 @@ index.html:
         }
         
         // Show appropriate fields based on account type selection
-        function showAccountFields() {
-            const accountType = document.getElementById('accountType').value;
-            const accountFields = document.getElementById('accountFields');
-            
-            let fieldsHTML = '';
-            
-            if (accountType === 'savings') {
-                fieldsHTML = `
-                    <div class="form-group">
-                        <label for="name">Full Name:</label>
-                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label for="openDate">Open Date:</label>
-                        <input type="date" id="openDate" name="openDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="initialDeposit">Initial Deposit (₹):</label>
-                        <input type="number" id="initialDeposit" name="initialDeposit" required placeholder="Enter amount">
-                    </div>
-                `;
-            } else if (accountType === 'current') {
-                fieldsHTML = `
-                    <div class="form-group">
-                        <label for="name">Full Name:</label>
-                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
-                    </div>
-                `;
-            } else if (accountType === 'loan') {
-                fieldsHTML = `
-                    <div class="form-group">
-                        <label for="name">Full Name:</label>
-                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label for="loanAmount">Loan Amount (₹):</label>
-                        <input type="number" id="loanAmount" name="loanAmount" required placeholder="Enter amount">
-                    </div>
-                    <div class="form-group">
-                        <label for="term">Term (months):</label>
-                        <input type="number" id="term" name="term" required placeholder="Enter loan term">
-                    </div>
-                    <div class="form-group">
-                        <label for="interestRate">Interest Rate (%):</label>
-                        <input type="number" step="0.01" id="interestRate" name="interestRate" required placeholder="Enter interest rate">
-                    </div>
-                `;
-            }
-            
-            accountFields.innerHTML = fieldsHTML;
-        }
+<!-- In the showAccountFields function in your JavaScript, update each account type to include date of birth -->
+
+function showAccountFields() {
+    const accountType = document.getElementById('accountType').value;
+    const accountFields = document.getElementById('accountFields');
+    
+    let fieldsHTML = `
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+        </div>
+        <div class="form-group">
+            <label for="picture">Upload Picture:</label>
+            <input type="file" id="picture" name="picture" accept="image/*" required>
+        </div>`;
+    
+    // Rest of the function remains the same...
+    
+    if (accountType === 'savings') {
+        fieldsHTML += `
+            <div class="form-group">
+                <label for="openDate">Open Date:</label>
+                <input type="date" id="openDate" name="openDate" required>
+            </div>
+            <div class="form-group">
+                <label for="initialDeposit">Initial Deposit (₹):</label>
+                <input type="number" id="initialDeposit" name="initialDeposit" required placeholder="Enter amount">
+            </div>`;
+    } else if (accountType === 'loan') {
+        fieldsHTML += `
+            <div class="form-group">
+                <label for="loanAmount">Loan Amount (₹):</label>
+                <input type="number" id="loanAmount" name="loanAmount" required placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label for="term">Term (months):</label>
+                <input type="number" id="term" name="term" required placeholder="Enter loan term">
+            </div>
+            <div class="form-group">
+                <label for="interestRate">Interest Rate (%):</label>
+                <input type="number" step="0.01" id="interestRate" name="interestRate" required placeholder="Enter interest rate">
+            </div>`;
+    }
+    
+    accountFields.innerHTML = fieldsHTML;
+}
+
         
         // Show appropriate fields based on transaction type selection
         function showTransactionFields() {
