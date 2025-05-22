@@ -1,5 +1,6 @@
 	-- Create the database
-	CREATE DATABASE IF NOT EXISTS rv_bank;
+	DROP DATABASE IF EXISTS rv_bank;
+    CREATE DATABASE IF NOT EXISTS rv_bank;
 	USE rv_bank;
 
 	-- Create branches table
@@ -21,6 +22,8 @@
 	CREATE TABLE customers (
 		customer_id INT PRIMARY KEY AUTO_INCREMENT,
 		name VARCHAR(100) NOT NULL,
+        date_of_birth DATE NOT NULL,
+        picture_path VARCHAR(255) NOT NULL,
 		branch_id INT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
@@ -130,3 +133,4 @@
 		RETURN account_num;
 	END //
 	DELIMITER ;
+   
