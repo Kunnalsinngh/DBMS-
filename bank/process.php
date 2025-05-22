@@ -17,6 +17,13 @@ function clean_input($data) {
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
+// Helper function to calculate age
+function calculateAge($dob) {
+    $today = new DateTime();
+    $birthdate = new DateTime($dob);
+    return $today->diff($birthdate)->y;
+}
+
 // Helper function to check if account exists
 function account_exists($conn, $account_number) {
     // Check savings accounts
@@ -124,6 +131,16 @@ function generate_account_number($conn, $branch_id, $account_type) {
 
 // Helper function to display account details
 function display_account_details($account, $account_type) {
+    $dob = new DateTime($account['date_of_birth']);
+    $today = new DateTime();
+    $age = $today->diff($dob)->y;
+     $picture_html = '';
+    if (!empty($account['picture_path'])) {
+        $picture_html = '<div style="text-align: center; margin-bottom: 20px;">
+            <img src="'.$account['picture_path'].'" alt="Customer Picture" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
+        </div>';
+    }
+    
     echo '<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -200,9 +217,12 @@ function display_account_details($account, $account_type) {
     <body>
         <div class="account-details-container">
             <h3>'.$account_type.' Details</h3>
+                        '.$picture_html.'
+
             <div class="account-details-content">
                 <p><strong>Account Number:</strong> '.htmlspecialchars($account['account_number']).'</p>
                 <p><strong>Customer Name:</strong> '.htmlspecialchars($account['name']).'</p>
+                <p><strong>Date of Birth:</strong> '.htmlspecialchars($account['date_of_birth']).' (Age: '.$age.')</p>
                 <p><strong>Branch:</strong> '.htmlspecialchars($account['branch_name']).'</p>
                 <div class="balance-highlight">
                     <strong>Current Balance:</strong> ₹'.number_format($account['current_balance'], 2).'
@@ -218,26 +238,35 @@ function display_account_details($account, $account_type) {
     </body>
     </html>';
 }
+
 // Helper function to display loan details
 function display_loan_details($loan) {
-    echo '<div class="account-details-container">';
-    echo '<h3>Loan Account Details</h3>';
+    $dob = new DateTime($loan['date_of_birth']);
+    $today = new DateTime();
+    $age = $today->diff($dob)->y;
+    $picture_html = '';
+    if (!empty($loan['picture_path'])) {
+        $picture_html = '<div style="text-align: center; margin-bottom: 20px;">
+            <img src="'.$loan['picture_path'].'" alt="Customer Picture" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
+        </div>';
+    }
     
-    echo '<div class="account-details-content">';
-    echo '<p><strong>Loan Number:</strong> ' . htmlspecialchars($loan['loan_number']) . '</p>';
-    echo '<p><strong>Customer Name:</strong> ' . htmlspecialchars($loan['name']) . '</p>';
-    echo '<p><strong>Branch:</strong> ' . htmlspecialchars($loan['branch_name']) . '</p>';
-    echo '<p><strong>Loan Amount:</strong> ₹' . number_format($loan['loan_amount'], 2) . '</p>';
-    
-    echo '<div class="balance-highlight">';
-    echo '<strong>Remaining Balance:</strong> ₹' . number_format($loan['remaining_balance'], 2);
-    echo '</div>';
-    
-    echo '<p><strong>Term:</strong> ' . htmlspecialchars($loan['term_months']) . ' months</p>';
-    echo '<p><strong>Interest Rate:</strong> ' . htmlspecialchars($loan['interest_rate']) . '%</p>';
-    
-    echo '</div>'; // Close account-details-content
-    echo '</div>'; // Close account-details-container
+    echo '<div class="account-details-container">
+            <h3>Loan Account Details</h3>
+             '.$picture_html.'
+            <div class="account-details-content">
+                <p><strong>Loan Number:</strong> '.htmlspecialchars($loan['loan_number']).'</p>
+                <p><strong>Customer Name:</strong> '.htmlspecialchars($loan['name']).'</p>
+                <p><strong>Date of Birth:</strong> '.htmlspecialchars($loan['date_of_birth']).' (Age: '.$age.')</p>
+                <p><strong>Branch:</strong> '.htmlspecialchars($loan['branch_name']).'</p>
+                <p><strong>Loan Amount:</strong> ₹'.number_format($loan['loan_amount'], 2).'</p>
+                <div class="balance-highlight">
+                    <strong>Remaining Balance:</strong> ₹'.number_format($loan['remaining_balance'], 2).'
+                </div>
+                <p><strong>Term:</strong> '.htmlspecialchars($loan['term_months']).' months</p>
+                <p><strong>Interest Rate:</strong> '.htmlspecialchars($loan['interest_rate']).'%</p>
+            </div>
+        </div>';
 }
 
 // Handle form type
@@ -249,9 +278,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Account Creation
         // -------------------------
         if ($form_type == "create_account") {
+            $upload_dir = "uploads/";
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
+
+// In the create_account section, after validating age:
+$picture_path = "";
+if (isset($_FILES['picture']) && $_FILES['picture']['error'] == UPLOAD_ERR_OK) {
+    $file_tmp_path = $_FILES['picture']['tmp_name'];
+    $file_name = $_FILES['picture']['name'];
+    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+    $new_file_name = md5(time() . $file_name) . '.' . $file_ext;
+    $dest_path = $upload_dir . $new_file_name;
+    
+    if(move_uploaded_file($file_tmp_path, $dest_path)) {
+        $picture_path = $dest_path;
+    } else {
+        echo '<div class="error-message">Error uploading picture.</div>';
+        exit;
+    }
+}
             $name = clean_input($_POST["name"]);
+            $dob = clean_input($_POST["dob"]);
             $branch_name = clean_input($_POST["branch"]);
             $account_type = clean_input($_POST["accountType"]);
+            
+            // Validate age
+            $age = calculateAge($dob);
+            if ($age < 18) {
+                echo '<div class="error-message">Customer must be at least 18 years old to create an account.</div>';
+                exit;
+            }
             
             // First get branch_id from branch name
             $branch_sql = "SELECT branch_id FROM branches WHERE branch_name = ?";
@@ -265,9 +323,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $branch_id = $branch_row['branch_id'];
                 
                 // Insert customer first
-                $customer_sql = "INSERT INTO customers (name, branch_id) VALUES (?, ?)";
-                $customer_stmt = $conn->prepare($customer_sql);
-                $customer_stmt->bind_param("si", $name, $branch_id);
+                $customer_sql = "INSERT INTO customers (name, date_of_birth, picture_path, branch_id) VALUES (?, ?, ?, ?)";
+$customer_stmt = $conn->prepare($customer_sql);
+$customer_stmt->bind_param("sssi", $name, $dob, $picture_path, $branch_id);
                 
                 if ($customer_stmt->execute()) {
                     $customer_id = $conn->insert_id;
@@ -452,11 +510,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $log_stmt->execute();
             
             // Check savings accounts first
-            $savings_sql = "SELECT sa.*, c.name, b.branch_name 
-                           FROM savings_accounts sa
-                           JOIN customers c ON sa.customer_id = c.customer_id
-                           JOIN branches b ON sa.branch_id = b.branch_id
-                           WHERE sa.account_number = ?";
+            $savings_sql = "SELECT sa.*, c.name, c.date_of_birth, c.picture_path, b.branch_name 
+               FROM savings_accounts sa
+               JOIN customers c ON sa.customer_id = c.customer_id
+               JOIN branches b ON sa.branch_id = b.branch_id
+               WHERE sa.account_number = ?";
+
             $savings_stmt = $conn->prepare($savings_sql);
             $savings_stmt->bind_param("s", $account_id);
             $savings_stmt->execute();
@@ -469,11 +528,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             
             // Check current accounts
-            $current_sql = "SELECT ca.*, c.name, b.branch_name 
-                           FROM current_accounts ca
-                           JOIN customers c ON ca.customer_id = c.customer_id
-                           JOIN branches b ON ca.branch_id = b.branch_id
-                           WHERE ca.account_number = ?";
+           $current_sql = "SELECT ca.*, c.name, c.date_of_birth, c.picture_path, b.branch_name 
+               FROM current_accounts ca
+               JOIN customers c ON ca.customer_id = c.customer_id
+               JOIN branches b ON ca.branch_id = b.branch_id
+               WHERE ca.account_number = ?";
+
             $current_stmt = $conn->prepare($current_sql);
             $current_stmt->bind_param("s", $account_id);
             $current_stmt->execute();
@@ -486,11 +546,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             
             // Check loan accounts
-            $loan_sql = "SELECT la.*, c.name, b.branch_name 
-                        FROM loan_accounts la
-                        JOIN customers c ON la.customer_id = c.customer_id
-                        JOIN branches b ON la.branch_id = b.branch_id
-                        WHERE la.loan_number = ?";
+            $loan_sql = "SELECT la.*, c.name, c.date_of_birth, c.picture_path, b.branch_name 
+            FROM loan_accounts la
+            JOIN customers c ON la.customer_id = c.customer_id
+            JOIN branches b ON la.branch_id = b.branch_id
+            WHERE la.loan_number = ?";
             $loan_stmt = $conn->prepare($loan_sql);
             $loan_stmt->bind_param("s", $account_id);
             $loan_stmt->execute();
